@@ -1,3 +1,5 @@
+const send = require("send");
+
 // elements from the HTML document
 const searchInput = document.getElementById("search-input");
 const chatList = document.getElementById("chat-list");
@@ -77,59 +79,124 @@ function getDateLabel(date) {
 }
 
 // A function to create a chat list item element from a chat object
+// function createChatListItem(chat) {
+//   const chatListItem = document.createElement("div");
+//   chatListItem.classList.add("chat-list-item");
+
+//   const img = document.createElement("img");
+//   img.src = chat.imageURL;
+//   img.alt = chat.title;
+
+//   const chatListItemInfo = document.createElement("div");
+//   chatListItemInfo.classList.add("chat-list-item-info");
+
+//   const chatListItemTitle = document.createElement("span");
+//   chatListItemTitle.classList.add("chat-list-item-title");
+//   chatListItemTitle.textContent = chat.title;
+
+//   const chatListItemOrderId = document.createElement("span");
+//   chatListItemOrderId.classList.add("chat-list-item-order-id");
+//   chatListItemOrderId.textContent = `Order ID: ${chat.orderId}`;
+
+//   const chatListItemDate = document.createElement("span");
+//   chatListItemDate.classList.add("chat-list-item-date");
+
+//   const latestMessageTimestamp = chat.latestMessageTimestamp;
+
+//   if (latestMessageTimestamp) {
+//     const latestMessageDate = new Date(latestMessageTimestamp);
+//     chatListItemDate.textContent = formatDate(latestMessageDate);
+//   }
+//   chatListItem.appendChild(img);
+//   chatListItemInfo.appendChild(chatListItemTitle);
+//   chatListItemInfo.appendChild(chatListItemOrderId);
+//     // chatListItemInfo.appendChild(chatListItemLastMsg);
+
+//   chatListItem.appendChild(chatListItemInfo);
+//   chatListItem.appendChild(chatListItemDate);
+
+//   chatListItem.addEventListener("click", function () {
+//     currentChat = chat;
+//     displayRightSection();
+//     const chatListItems = document.querySelectorAll(".chat-list-item");
+//     for (let item of chatListItems) {
+//       item.classList.remove("selected");
+//     }
+
+//     this.classList.add("selected");
+
+//     // Update the chat header, chat body, and chat footer elements
+//     updateChatHeader();
+//     updateChatBody();
+//     updateChatFooter();
+//   });
+
+//   return chatListItem;
+// }
 function createChatListItem(chat) {
-  const chatListItem = document.createElement("div");
-  chatListItem.classList.add("chat-list-item");
-
-  const img = document.createElement("img");
-  img.src = chat.imageURL;
-  img.alt = chat.title;
-
-  const chatListItemInfo = document.createElement("div");
-  chatListItemInfo.classList.add("chat-list-item-info");
-
-  const chatListItemTitle = document.createElement("span");
-  chatListItemTitle.classList.add("chat-list-item-title");
-  chatListItemTitle.textContent = chat.title;
-
-  const chatListItemOrderId = document.createElement("span");
-  chatListItemOrderId.classList.add("chat-list-item-order-id");
-  chatListItemOrderId.textContent = `Order ID: ${chat.orderId}`;
-
-  const chatListItemDate = document.createElement("span");
-  chatListItemDate.classList.add("chat-list-item-date");
-
-  const latestMessageTimestamp = chat.latestMessageTimestamp;
-
-  if (latestMessageTimestamp) {
-    const latestMessageDate = new Date(latestMessageTimestamp);
-    chatListItemDate.textContent = formatDate(latestMessageDate);
-  }
-  chatListItem.appendChild(img);
-  chatListItemInfo.appendChild(chatListItemTitle);
-  chatListItemInfo.appendChild(chatListItemOrderId);
-
-  chatListItem.appendChild(chatListItemInfo);
-  chatListItem.appendChild(chatListItemDate);
-
-  chatListItem.addEventListener("click", function () {
-    currentChat = chat;
-    displayRightSection();
-    const chatListItems = document.querySelectorAll(".chat-list-item");
-    for (let item of chatListItems) {
-      item.classList.remove("selected");
+    const chatListItem = document.createElement("div");
+    chatListItem.classList.add("chat-list-item");
+  
+    const img = document.createElement("img");
+    img.src = chat.imageURL;
+    img.alt = chat.title;
+  
+    const chatListItemInfo = document.createElement("div");
+    chatListItemInfo.classList.add("chat-list-item-info");
+  
+    const chatListItemTitle = document.createElement("span");
+    chatListItemTitle.classList.add("chat-list-item-title");
+    chatListItemTitle.textContent = chat.title;
+  
+    const chatListItemOrderId = document.createElement("span");
+    chatListItemOrderId.classList.add("chat-list-item-order-id");
+    chatListItemOrderId.textContent = `Order ID: ${chat.orderId}`;
+  
+    const chatListItemDate = document.createElement("span");
+    chatListItemDate.classList.add("chat-list-item-date");
+  
+    const latestMessageTimestamp = chat.latestMessageTimestamp;
+  
+    if (latestMessageTimestamp) {
+      const latestMessageDate = new Date(latestMessageTimestamp);
+      chatListItemDate.textContent = formatDate(latestMessageDate);
     }
-
-    this.classList.add("selected");
-
-    // Update the chat header, chat body, and chat footer elements
-    updateChatHeader();
-    updateChatBody();
-    updateChatFooter();
-  });
-
-  return chatListItem;
-}
+  
+    const lastMessageContent = document.createElement("div");
+    lastMessageContent.classList.add("chat-list-item-last-message");
+  
+    const lastMessage = chat.messageList[chat.messageList.length - 1];
+  
+    if (lastMessage) {
+      lastMessageContent.textContent = lastMessage.message;
+    }
+  
+    chatListItem.appendChild(img);
+    chatListItemInfo.appendChild(chatListItemTitle);
+    chatListItemInfo.appendChild(chatListItemOrderId);
+    chatListItemInfo.appendChild(lastMessageContent); // Add the last message content
+    chatListItem.appendChild(chatListItemInfo);
+    chatListItem.appendChild(chatListItemDate);
+  
+    chatListItem.addEventListener("click", function () {
+      currentChat = chat;
+      displayRightSection();
+      const chatListItems = document.querySelectorAll(".chat-list-item");
+      for (let item of chatListItems) {
+        item.classList.remove("selected");
+      }
+  
+      this.classList.add("selected");
+  
+      // Update the chat header, chat body, and chat footer elements
+      updateChatHeader();
+      updateChatBody();
+      updateChatFooter();
+    });
+  
+    return chatListItem;
+  }
+  
 function createMessage(message) {
   const messageElement = document.createElement("div");
   messageElement.classList.add("message");
@@ -204,31 +271,69 @@ function createOptionedMessage(options) {
 }
 
 // A function to create a chat input element
+// function createChatInput() {
+//   const chatInput = document.createElement("div");
+//   chatInput.classList.add("chat-input");
+
+//   const input = document.createElement("input");
+//   input.type = "text";
+//   input.placeholder = "Type a message...";
+//   input.id = "message-input";
+
+//   input.addEventListener("keyup", function (event) {
+//     // If the enter key is pressed, get the input value and add a user message with that value
+//     if (event.keyCode === 13) {
+//       const message = input.value.trim();
+//       if (message) {
+//         addUserMessage(message);
+//       }
+
+//       input.value = "";
+//     }
+//   });
+
+//   chatInput.appendChild(input);
+
+//   return chatInput;
+// }
+
+// A function to create a chat input element
 function createChatInput() {
-  const chatInput = document.createElement("div");
-  chatInput.classList.add("chat-input");
-
-  const input = document.createElement("input");
-  input.type = "text";
-  input.placeholder = "Type a message...";
-  input.id = "message-input";
-
-  input.addEventListener("keyup", function (event) {
-    // If the enter key is pressed, get the input value and add a user message with that value
-    if (event.keyCode === 13) {
+    const chatInput = document.createElement("div");
+    chatInput.classList.add("chat-input");
+  
+    const input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = "Type a message...";
+    input.id = "message-input";
+  
+    const sendButton = document.createElement("button");
+    sendButton.textContent = "Send";
+    sendButton.classList.add("send-button");
+    sendButton.addEventListener("click", function () {
+      // Get the input value and add a user message with that value
       const message = input.value.trim();
       if (message) {
         addUserMessage(message);
       }
-
+  
+      // Clear the input value
       input.value = "";
-    }
-  });
-
-  chatInput.appendChild(input);
-
-  return chatInput;
-}
+    });
+  
+    input.addEventListener("keyup", function (event) {
+      // If the enter key is pressed, trigger the send button click event
+      if (event.keyCode === 13) {
+        sendButton.click();
+      }
+    });
+  
+    chatInput.appendChild(input);
+    chatInput.appendChild(sendButton);
+  
+    return chatInput;
+  }
+  
 
 // A function to create a date label element from a date object
 function createDateLabel(date) {
